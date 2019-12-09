@@ -1,6 +1,6 @@
 ## External task pattern:
 
- 
+ ![pattern](/doc/1.png)
 
 Process Engine: Creation of an external task instance
 
@@ -11,13 +11,12 @@ External Worker & Process Engine: Complete external task instance
  
 
 
-External task sequence :
+#### External task sequence :
  
 
-External task must declare a topic
+External task must declare a topic:
 
-
- 
+ ![topic](/doc/2.png)
 
 External task workers subscribe to the topic.
 
@@ -28,14 +27,9 @@ process engine mark the external task as completed.
  
 
 
-External task java client:
-POC code sample : poc-external-task 
+#### External task java client:
 
-https://github.com/camunda/camunda-external-task-client-java ‑ 
-Connect your account to preview links
- 
-
- 
+doc : https://github.com/camunda/camunda-external-task-client-java ‑ 
 
 To use the external task in the project we should add this dependency to the project (out of the box of the engine): 
 ```
@@ -70,15 +64,16 @@ private ClientRequestInterceptor createClientInterceptor(String engineUserName, 
     }
 ``` 
     
-baseUrl: the link to the remote camunda engine rest api .
+* baseUrl: the link to the remote camunda engine rest api .
 
-lockDuration : in milliseconds to lock the external tasks .
+* lockDuration : in milliseconds to lock the external tasks .
 
  
 
 Client subscription and handler :  
 
-
+ ![handler](/doc/3.png)
+ 
 The client should subscribe to a topic defined in the remote engine
 
 The client fetch and lock continuously for newly appearing External Tasks provided by the Workflow Engine.
