@@ -111,3 +111,127 @@ The Client when complete the task can send variable to the engine :
 
  Map<String, Object> variables = new HashMap<>();
 externalTaskService.complete(externalTask, variables);
+
+
+
+How to create a JavaScript based worker: 
+
+Create a package.json file : 
+ 
+```json
+{
+  "name": "poc-camunda-external-task-worker",
+  "version": "1.0.0",
+  "main": "worker.js",
+  "author": "POC"
+  }
+```  
+Where : 
+
+lists the packages your project depends on.
+
+specifies versions of a package that your project can use using semantic versioning rules.
+
+makes your build reproducible, and therefore easier to share with other developers.
+
+ 
+
+
+Install camunda-external-task-client-js : 
+
+```
+npm install  camunda-external-task-client-js --save
+```
+This command will install the  camunda-external-task-client-js  with all dependency and add this lib to the package json file:
+
+```json
+{
+  "name": "poc-camunda-external-task-worker",
+  "version": "1.0.0",
+  "main": "worker.js",
+  "author": "poc ",
+  "license": "Apache License 2.0",
+  "dependencies": {
+    "camunda-external-task-client-js": "^1.3.0"
+  }
+}
+```
+
+
+Create worker.js : 
+ 
+```javascript
+/**
+ * 
+ * Sample external task worker
+ */
+ 
+const {Client, BasicAuthInterceptor,logger, Variables} = require("camunda-external-task-client-js");
+
+const basicAuthentication = new BasicAuthInterceptor({
+    username: "admin",
+    password: "admin"
+  }); 
+
+// configuration for the Client:
+// - 'baseUrl': url to the Workflow Engine
+// - 'logger': utility to automatically log important events
+// -interceptors : interceptors to add custom information to request header in our example its basicAuthentication for 
+const config = {baseUrl: "https://localhost:8080/rest", interceptors: basicAuthentication, use: logger,asyncResponseTimeout:5000,maxTasks:1};
+
+
+// create a Client instance with custom configuration
+const client = new Client(config);
+
+client.subscribe("checkAvailability", async function ({task, taskService}) {
+    //await taskService.extendLock(task, 5);
+
+    const processVariables = new Variables();
+    // randomize true or false for "isAvailble" variable
+    const isAvailble = Math.random() >= 0.5;
+
+      // add the variable to the collection
+      processVariables.set("isAvailble", isAvailble);
+
+    console.log("......finishing up 'checkAvailability' topic work");
+
+    // complete the task in Camunda Engine via the client API
+    await taskService.complete(task, processVariables);
+
+});
+ ```
+ 
+ 
+
+Start the worker : 
+
+ 
+```
+node worker.js
+```
+
+Polling tasks from the engine works by performing a fetch & lock operation of tasks that have subscriptions. It then calls the handler registered to each task.
+
+Polling is done periodically based on the interval configuration. 
+
+ 
+
+
+Modeling the external task and deploy to process engine:
+Let’s assume that we have a sample process that will use an external task to make a decision : Take direction to  A or B : 
+
+
+Check availability : is an external task that will be executed in an external worker (in our case the nodejs client).
+
+Check availability:  Will return a Boolean variable #{isAvailble} to decide going on direction A or B.
+
+Prepare the bpmn model : 
+We should give a unique topic name to the external task , that will be used by Clients to subscribe
+
+
+Configure the ExclusiveGateway : 
+
+
+Deploy the project to running  Camunda engine 
+
+
