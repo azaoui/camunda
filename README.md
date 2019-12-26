@@ -17,6 +17,8 @@ Client has to perform multiple recurring requests until an information is availa
 
 The client makes requests periodically, and the server sends data if there is a response. In case there is no data to be sent by the server, an empty response is returned. The following diagram shows how continuous polling works:
 
+ ![pattern](/doc/7963OS_06_01.jpg)
+
 
  
 
