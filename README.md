@@ -8,6 +8,25 @@ External Worker: Fetch and lock external tasks
 
 External Worker & Process Engine: Complete external task instance
 
+
+External task in camunda is a pattern where workers are independent of the process engine and receive work items by polling the process engine’s APIs. 
+
+
+## Polling Definition : 
+Client has to perform multiple recurring requests until an information is available.
+
+The client makes requests periodically, and the server sends data if there is a response. In case there is no data to be sent by the server, an empty response is returned. The following diagram shows how continuous polling works:
+
+
+ 
+
+#### Problem : 
+This approach can obviously be expensive in terms of resources especially if the the polling is too frequently. 
+
+#### How Camunda external task reduce this impact with the external task pattern : 
+
+Long polling significantly reduces the number of requests and enables using resources more efficiently on both the server and the client side.
+
  
 
 
